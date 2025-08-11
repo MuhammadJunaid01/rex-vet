@@ -1,6 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -12,7 +9,6 @@ import {
   Mail,
   Shield,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useMemo } from "react";
 import { FaTiktok } from "react-icons/fa";
@@ -21,14 +17,29 @@ import FooterContactCard from "./FooterContactCard";
 import FooterQuickLinks from "./FooterQuickLinks";
 import FooterSocialLinks from "./FooterSocialLinks";
 import FooterTrustBadgeCard from "./FooterTrustBadgeCard";
-// import ModernLogo from "../components/ModernLogos";
+
+// Define the type for a link
+interface LinkType {
+  to: string;
+  text: string;
+}
+
+declare global {
+  interface Window {
+    gnp_request: {
+      slug: string;
+      "color-set": number;
+      campaign: number;
+    };
+  }
+}
 
 const Footer = React.memo(() => {
   const sitemapLinks = useMemo(
     () => [
       { to: "/", text: "Home" },
       { to: "/PetParents", text: "For pet parents" },
-      { to: "/VetsandTechs", text: "For vets & techs" },
+      { to: "/VetandTechs", text: "For Vet & techs" },
       { to: "/About", text: "About" },
       { to: "/Blogs", text: "Blogs" },
       { to: "/Support", text: "Support" },
@@ -36,7 +47,7 @@ const Footer = React.memo(() => {
     []
   );
 
-  const usefulLinks = useMemo(
+  const usefulLinks: LinkType[] = useMemo(
     () => [
       { to: "/NonProfitPage", text: "Non Profit Status" },
       { to: "/SupportUs", text: "Support Us" },
@@ -51,7 +62,7 @@ const Footer = React.memo(() => {
   const socialLinks = useMemo(
     () => [
       {
-        href: "https://www.instagram.com/rexvets",
+        href: "https://www.instagram.com/rexVet",
         icon: Instagram,
         label: "Instagram",
       },
@@ -61,12 +72,12 @@ const Footer = React.memo(() => {
         label: "Facebook",
       },
       {
-        href: "https://www.tiktok.com/@rexvets",
+        href: "https://www.tiktok.com/@rexVet",
         icon: FaTiktok,
         label: "TikTok",
       },
       {
-        href: "mailto:support@rexvets.com",
+        href: "mailto:support@rexVet.com",
         icon: Mail,
         label: "Email",
       },
@@ -82,8 +93,8 @@ const Footer = React.memo(() => {
     script.async = true;
     document.body.appendChild(script);
 
-    (window as any).gnp_request = {
-      slug: "rex-vets-inc",
+    window.gnp_request = {
+      slug: "rex-Vet-inc",
       "color-set": 1,
       campaign: 66,
     };
@@ -142,7 +153,7 @@ Footer.displayName = "Footer";
 
 export default Footer;
 
-const LegalLinks = ({ links }: { links: any[] }) => (
+const LegalLinks = ({ links }: { links: LinkType[] }) => (
   <div>
     <SectionTitle>Legal & Support</SectionTitle>
     <div className="flex flex-col space-y-1">
@@ -190,7 +201,7 @@ const BottomSection = () => (
     <p className="flex flex-wrap items-center justify-center gap-1 text-sm text-white/80 md:justify-end md:text-base [text-shadow:0_1px_2px_rgba(0,0,0,0.2)]">
       Made with
       <Heart size={16} fill="#fbbf24" color="#fbbf24" />
-      for ©{new Date().getFullYear()} Rex Vets. All rights reserved.
+      for ©{new Date().getFullYear()} Rex Vet. All rights reserved.
     </p>
   </div>
 );

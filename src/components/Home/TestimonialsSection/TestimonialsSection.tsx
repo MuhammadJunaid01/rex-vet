@@ -11,7 +11,7 @@ import TestimonialsSectionHeader from "./TestimonialsSectionHeader";
 const mockGoogleReviews = [
   {
     name: "Amr Taha",
-    text: "I've used other online vet services but Rex Vets is by far the best. Their vet was super compassionate and took time to listen. I loved that they weren't trying to upsell me or rush things. My cat had a minor cold and after the advice we got from Rex Vets, he's doing much better. Highly recommend!",
+    text: "I've used other online vet services but Rex Vet is by far the best. Their vet was super compassionate and took time to listen. I loved that they weren't trying to upsell me or rush things. My cat had a minor cold and after the advice we got from Rex Vet, he's doing much better. Highly recommend!",
     image:
       "https://ui-avatars.com/api/?name=Amr+Taha&background=4285f4&color=fff&size=150",
     date: "4 days ago",
@@ -20,7 +20,7 @@ const mockGoogleReviews = [
   },
   {
     name: "Maria Santos",
-    text: "Outstanding telehealth service! The vet was incredibly thorough and helped me understand my dog's allergies. The online prescription service saved me so much time. Rex Vets really cares about pets and their families.",
+    text: "Outstanding telehealth service! The vet was incredibly thorough and helped me understand my dog's allergies. The online prescription service saved me so much time. Rex Vet really cares about pets and their families.",
     image:
       "https://ui-avatars.com/api/?name=Maria+Santos&background=34a853&color=fff&size=150",
     date: "1 week ago",
@@ -29,7 +29,7 @@ const mockGoogleReviews = [
   },
   {
     name: "Dr. Michael Chen",
-    text: "As a physician myself, I appreciate the professionalism and expertise of Rex Vets. They provided excellent guidance for my senior cat's health issues. The convenience of telehealth for pets is a game-changer.",
+    text: "As a physician myself, I appreciate the professionalism and expertise of Rex Vet. They provided excellent guidance for my senior cat's health issues. The convenience of telehealth for pets is a game-changer.",
     image:
       "https://ui-avatars.com/api/?name=Michael+Chen&background=ea4335&color=fff&size=150",
     date: "2 weeks ago",
@@ -38,7 +38,7 @@ const mockGoogleReviews = [
   },
   {
     name: "Jennifer Walsh",
-    text: "Great experience with Rex Vets! The vet was patient with my anxious dog and gave practical advice that actually worked. The affordable pricing makes quality vet care accessible to everyone.",
+    text: "Great experience with Rex Vet! The vet was patient with my anxious dog and gave practical advice that actually worked. The affordable pricing makes quality vet care accessible to everyone.",
     image:
       "https://ui-avatars.com/api/?name=Jennifer+Walsh&background=fbbc04&color=fff&size=150",
     date: "3 weeks ago",
@@ -103,25 +103,33 @@ const testimonials = [
     source: "curated",
   },
 ];
-
+// https://github.com/jdrexxxx/Rexvets-nextjs.git (fetch)
 const TestimonialsSection: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [allTestimonials, setAllTestimonials] = useState<ITestimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  //   const [googlePlacesService] = useState(() => new GooglePlacesService());
 
   // Responsive card count
   const getCardsPerView = () => {
-    if (typeof window === "undefined") return 3; // Default fallback for SSR
+    if (typeof window === "undefined") return 1; // Default to 1 for SSR to match mobile
     const width = window.innerWidth;
     if (width < 768) return 1; // Mobile
     if (width < 1024) return 2; // Tablet
     return 3; // Desktop
   };
 
-  const cardsPerView = getCardsPerView();
+  const [cardsPerView, setCardsPerView] = useState(getCardsPerView());
+
+  // Update cardsPerView on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setCardsPerView(getCardsPerView());
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Shuffle array
   const shuffleArray = useCallback((array: ITestimonial[]) => {
@@ -163,7 +171,6 @@ const TestimonialsSection: React.FC = () => {
       setError(null);
       try {
         let googleReviews: any[] = [];
-
         console.log("🚀 Fetching REAL Google reviews...");
         try {
           googleReviews = await getFilteredReviews(4);
@@ -253,11 +260,10 @@ const TestimonialsSection: React.FC = () => {
       <div className="absolute top-[10%] left-[5%] w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 opacity-10 animate-bounce" />
       <div className="absolute bottom-[15%] right-[8%] w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-red-500 opacity-10 animate-bounce [animation-delay:1s]" />
 
-      <div className="3xl:max-w-screen-3xl  py-8 mx-auto px-4 sm:px-6   lg:px-8 relative z-10">
+      <div className="3xl:max-w-screen-3xl py-8 mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <TestimonialsSectionHeader
           title="Testimonials"
-          description=" Discover why thousands of pet owners trust our veterinary expertise for
-                their beloved companions"
+          description="Discover why thousands of pet owners trust our veterinary expertise for their beloved companions"
           sub_title="What Our Pet Parents Say"
         />
 
@@ -278,39 +284,48 @@ const TestimonialsSection: React.FC = () => {
         {/* Testimonials Grid */}
         {!loading && allTestimonials.length > 0 && (
           <div className="mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div
+              className={`grid gap-4 mb-6 ${
+                cardsPerView === 1
+                  ? "grid-cols-1"
+                  : cardsPerView === 2
+                  ? "grid-cols-1 md:grid-cols-2"
+                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              }`}
+            >
               {getVisibleTestimonials().map((testimonial, idx) => (
-                <TestimonialsSectionCard
-                  key={`${testimonial.index}-${idx}`}
-                  testimonial={testimonial}
-                  isMiddle={idx === 1 && cardsPerView === 3}
-                />
+                <div key={`${testimonial.index}-${idx}`} className="w-full">
+                  <TestimonialsSectionCard
+                    testimonial={testimonial}
+                    isMiddle={idx === 1 && cardsPerView === 3}
+                  />
+                </div>
               ))}
             </div>
 
             {/* Navigation Buttons */}
-            <div className=" my-14">
+            <div className="my-14">
               {allTestimonials.length > 0 && (
                 <div className="flex justify-center items-center gap-4 mb-4">
                   <motion.div variants={buttonVariants} whileHover="hover">
                     <button
-                      className="h-[60px] w-[60px] items-center justify-center  flex flex-col rounded-full z-50 cursor-pointer hover:bg-[#1976D2] bg-white/90 backdrop-blur-xl border border-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.1)]"
+                      className="h-[60px] w-[60px] items-center justify-center flex flex-col rounded-full z-50 cursor-pointer hover:bg-[#1976D2] bg-white/90 backdrop-blur-xl border border-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.1)]"
                       onClick={goToPrevious}
                     >
                       <MdChevronLeft
                         size={40}
-                        className=" text-blue-600 hover:text-white"
+                        className="text-blue-600 hover:text-white"
                       />
                     </button>
                   </motion.div>
                   <motion.div variants={buttonVariants} whileHover="hover">
                     <button
-                      className="h-[60px] w-[60px] rounded-full items-center justify-center  flex flex-col  z-50 cursor-pointer hover:bg-[#1976D2]  bg-white/90 backdrop-blur-xl border border-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.1)]"
+                      className="h-[60px] w-[60px] rounded-full items-center justify-center flex flex-col z-50 cursor-pointer hover:bg-[#1976D2] bg-white/90 backdrop-blur-xl border border-blue-100 shadow-[0_8px_32px_rgba(59,130,246,0.1)]"
                       onClick={goToNext}
                     >
                       <MdChevronRight
                         size={40}
-                        className=" text-blue-600 hover:text-white"
+                        className="text-blue-600 hover:text-white"
                       />
                     </button>
                   </motion.div>
